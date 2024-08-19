@@ -29,9 +29,9 @@ public class SubTaskImpl implements SubTaskService {
     public final TaskRepository taskRepository;
 
     @Override
-    public ApiRes getAllSubTask() {
+    public ApiRes getAllSubTask(String name,String priority,Long idStatus) {
         try {
-            List<SubTask> subTaskList = subTaskRepository.findAll();
+            List<SubTask> subTaskList = subTaskRepository.getAllSubTask(name, priority, idStatus);
             List<SubTaskRes> subTaskResList = subTaskList.stream().map(SubTaskMapping::mapEntityToRes).toList();
             return new ApiRes(true, "Lấy dữ liệu thành công", subTaskResList);
         } catch (Exception e) {
@@ -44,11 +44,15 @@ public class SubTaskImpl implements SubTaskService {
         try {
             SubTask subTaskCreate = SubTaskMapping.mapReqToEntity(subTaskReq);
             Optional<Status> status = statusRepository.findById(subTaskReq.getId_status());
+            Optional<Status> statusOpen = statusRepository.findById(1L);
+            Optional<Status> statusDone = statusRepository.findById(2L);
             Optional<Task> task = taskRepository.findById(subTaskReq.getId_task());
+            System.out.println(status.get().getName());
             if (status.get().getName().equals("done")) {
                 subTaskCreate.setProgress(100F);
+            }else {
+                subTaskCreate.setProgress(0F);
             }
-            subTaskCreate.setProgress(0F);
             subTaskCreate.setCreatedAt(LocalDateTime.now());
             subTaskCreate.setStatus(status.get());
             subTaskCreate.setTask(task.get());
@@ -57,6 +61,11 @@ public class SubTaskImpl implements SubTaskService {
             List<SubTask> soLuongSubTaskDone = task.get().getSubtasks().stream().filter(el -> el.getStatus().getName().equals("done")).toList();
             Float tongSoLuongSubTask = Float.valueOf(task.get().getSubtasks().size());
             Float progress = (soLuongSubTaskDone.size() / tongSoLuongSubTask) * 100;
+            if(progress != 100L){
+                task.get().setStatus(statusOpen.get());
+            }else {
+                task.get().setStatus(statusDone.get());
+            }
             task.get().setProgress(progress);
             taskRepository.save(task.get());
 
@@ -73,19 +82,27 @@ public class SubTaskImpl implements SubTaskService {
             if (subTaskById.isPresent()) {
                 SubTask subTaskUpdate = SubTaskMapping.mapReqToEntity(subTaskReq);
                 Optional<Status> status = statusRepository.findById(subTaskReq.getId_status());
+                Optional<Status> statusOpen = statusRepository.findById(1L);
+                Optional<Status> statusDone = statusRepository.findById(2L);
                 Optional<Task> task = taskRepository.findById(subTaskReq.getId_task());
                 subTaskUpdate.setId(id);
                 if (status.get().getName().equals("done")) {
                     subTaskUpdate.setProgress(100F);
+                }else {
+                    subTaskUpdate.setProgress(0F);
                 }
-                subTaskUpdate.setProgress(0F);
+
                 subTaskUpdate.setStatus(status.get());
                 subTaskUpdate.setTask(task.get());
-
                 subTaskRepository.save(subTaskUpdate);
                 List<SubTask> soLuongSubTaskDone = task.get().getSubtasks().stream().filter(el -> el.getStatus().getName().equals("done")).toList();
                 Float tongSoLuongSubTask = Float.valueOf(task.get().getSubtasks().size());
                 Float progress = (soLuongSubTaskDone.size() / tongSoLuongSubTask) * 100;
+                if(progress != 100L){
+                    task.get().setStatus(statusOpen.get());
+                }else {
+                    task.get().setStatus(statusDone.get());
+                }
                 task.get().setUpdatedAt(LocalDateTime.now());
                 task.get().setProgress(progress);
                 taskRepository.save(task.get());
@@ -103,15 +120,23 @@ public class SubTaskImpl implements SubTaskService {
     public ApiRes deleteSubTask(Long id) {
         try {
             Optional<SubTask> subTaskById = subTaskRepository.findById(id);
-            Optional<Task> task = taskRepository.findById(subTaskById.get().getTask().getId());
-            List<SubTask> soLuongSubTaskDone = task.get().getSubtasks().stream().filter(el -> el.getStatus().getName().equals("done")).toList();
-            Float tongSoLuongSubTask = Float.valueOf(task.get().getSubtasks().size());
-            Float progress = (soLuongSubTaskDone.size() / tongSoLuongSubTask) * 100;
+            Optional<Status> statusOpen = statusRepository.findById(1L);
+            Optional<Status> statusDone = statusRepository.findById(2L);
             if (subTaskById.isPresent()) {
+                Optional<Task> task = taskRepository.findById(subTaskById.get().getTask().getId());
+                subTaskRepository.deleteById(id);
+                List<SubTask> soLuongSubTaskDone = task.get().getSubtasks().stream().filter(el -> el.getStatus().getName().equals("done")).toList();
+                Float tongSoLuongSubTask = Float.valueOf(task.get().getSubtasks().size());
+                Float progress = (soLuongSubTaskDone.size() / tongSoLuongSubTask) * 100;
+                if(progress != 100L){
+                    task.get().setStatus(statusOpen.get());
+                }else {
+                    task.get().setStatus(statusDone.get());
+                }
                 task.get().setProgress(progress);
                 task.get().setUpdatedAt(LocalDateTime.now());
                 taskRepository.save(task.get());
-                subTaskRepository.deleteById(id);
+
                 return new ApiRes(true, "Xoá dữ liệu thành công", null);
             } else {
                 return new ApiRes(false, "Dữ liệu không tồn tại", null);

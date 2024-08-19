@@ -32,6 +32,7 @@ public class StatusImpl implements StatusService {
             List<Status> statusList = statusRepository.getAllStatus(name);
             List<StatusRes> statusResList = statusList.stream().map(StatusMapping::mapEntityToRes).toList();
             return new ApiRes(true, "Lấy dữ liệu thành công", statusResList);
+
         }catch (Exception e){
             return new ApiRes(false,e.getMessage(),null);
         }

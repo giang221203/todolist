@@ -4,6 +4,7 @@ import com.example.back.dto.req.TaskReq;
 import com.example.back.dto.res.ApiRes;
 import com.example.back.dto.res.TaskRes;
 import com.example.back.entity.Status;
+import com.example.back.entity.SubTask;
 import com.example.back.entity.Task;
 import com.example.back.mapping.TaskMapping;
 import com.example.back.repository.StatusRepository;
@@ -24,9 +25,9 @@ public class TaskImpl implements TaskService {
     public final StatusRepository statusRepository;
 
     @Override
-    public ApiRes getAllTask() {
+    public ApiRes getAllTask(String name,String priority,Long idStatus) {
         try {
-            List<Task> taskList = taskRepository.findAll();
+            List<Task> taskList = taskRepository.getAllTask(name, priority, idStatus);
             List<TaskRes> taskResList = taskList.stream().map(TaskMapping::mapEntityToRes).toList();
             return new ApiRes(true, "Lấy dữ liệu thành công", taskResList);
         } catch (Exception e) {
@@ -43,8 +44,10 @@ public class TaskImpl implements TaskService {
             taskCreate.setStatus(status.get());
             if(status.get().getName().equals("done")){
                 taskCreate.setProgress(100F);
+            }else {
+                taskCreate.setProgress(0F);
             }
-            taskCreate.setProgress(0F);
+
             taskRepository.save(taskCreate);
             TaskRes taskRes = TaskMapping.mapEntityToRes(taskCreate);
             List<TaskRes> taskResList = new ArrayList<>();
@@ -63,9 +66,14 @@ public class TaskImpl implements TaskService {
                 Task taskUpdate = TaskMapping.mapReqToEntity(taskReq);
                 taskUpdate.setId(id);
                 Optional<Status> status = statusRepository.findById(taskReq.getId_status());
+                Optional<Status> statusDone = statusRepository.findById(2L);
                 taskUpdate.setStatus(status.get());
                 if(status.get().getName().equals("done")){
                     taskUpdate.setProgress(100F);
+                    for (SubTask subTask :taskById.get().getSubtasks()){
+                        subTask.setStatus(statusDone.get());
+                        subTask.setProgress(100F);
+                    }
                 }
                 taskRepository.save(taskUpdate);
                 return new ApiRes(true, "Cập nhật dữ liệu thành công", null);
