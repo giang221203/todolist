@@ -9,5 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface TaskRepository extends JpaRepository<Task,Long> {
-
+    @Query("select t from Task t where t.name like %:name% and t.priority like %:priority% and ( :idStatus is null or t.status.id = :idStatus )")
+    List<Task> getAllTask(String name,String priority,Long idStatus);
 }
