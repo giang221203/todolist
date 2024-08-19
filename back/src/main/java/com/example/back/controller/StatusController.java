@@ -14,8 +14,10 @@ import org.springframework.web.bind.annotation.*;
 public class StatusController {
     public final StatusService statusService;
     @GetMapping("/getAll")
-    public ResponseEntity<ApiRes> getAllStatus(@RequestParam(name = "name",defaultValue = "") String name){
-        return ResponseEntity.ok(statusService.getAllStatus(name));
+    public ResponseEntity<ApiRes> getAllStatus(@RequestParam(name = "name",defaultValue = "") String name,
+                                               @RequestParam(name="page",defaultValue = "1") int page,
+                                               @RequestParam(name = "limit",defaultValue = "3")int limit){
+        return ResponseEntity.ok(statusService.getAllStatus(name,page,limit));
     }
     @PostMapping("/create")
     public ResponseEntity<ApiRes> createStatus(@RequestBody StatusReq statusReq){

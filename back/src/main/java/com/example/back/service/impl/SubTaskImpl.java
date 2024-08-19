@@ -14,6 +14,8 @@ import com.example.back.repository.SubTaskRepository;
 import com.example.back.repository.TaskRepository;
 import com.example.back.service.interf.SubTaskService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -29,9 +31,10 @@ public class SubTaskImpl implements SubTaskService {
     public final TaskRepository taskRepository;
 
     @Override
-    public ApiRes getAllSubTask(String name,String priority,Long idStatus) {
+    public ApiRes getAllSubTask(String name,String priority,Long idStatus,int page, int limit) {
         try {
-            List<SubTask> subTaskList = subTaskRepository.getAllSubTask(name, priority, idStatus);
+            Pageable pageable = PageRequest.of(page -1, limit);
+            List<SubTask> subTaskList = subTaskRepository.getAllSubTask(name, priority, idStatus,pageable);
             List<SubTaskRes> subTaskResList = subTaskList.stream().map(SubTaskMapping::mapEntityToRes).toList();
             return new ApiRes(true, "Lấy dữ liệu thành công", subTaskResList);
         } catch (Exception e) {

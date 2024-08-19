@@ -15,8 +15,13 @@ public class TaskController {
     public final TaskService taskService;
 
     @GetMapping("/getAll")
-    public ResponseEntity<ApiRes> getAllTask(@RequestParam(defaultValue = "")String name,@RequestParam(defaultValue = "") String priority,@RequestParam(required = false)  Long idStatus) {
-        return ResponseEntity.ok(taskService.getAllTask(name, priority, idStatus));
+    public ResponseEntity<ApiRes> getAllTask(@RequestParam(defaultValue = "")String name,
+                                             @RequestParam(defaultValue = "") String priority,
+                                             @RequestParam(required = false)  Long idStatus,
+                                             @RequestParam(name="page",defaultValue = "1") int page,
+                                             @RequestParam(name = "limit",defaultValue = "3")int limit
+                                             ) {
+        return ResponseEntity.ok(taskService.getAllTask(name, priority, idStatus,page,limit));
     }
 
     @PostMapping("/create")

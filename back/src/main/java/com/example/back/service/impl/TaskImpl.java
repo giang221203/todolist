@@ -11,6 +11,8 @@ import com.example.back.repository.StatusRepository;
 import com.example.back.repository.TaskRepository;
 import com.example.back.service.interf.TaskService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -25,9 +27,10 @@ public class TaskImpl implements TaskService {
     public final StatusRepository statusRepository;
 
     @Override
-    public ApiRes getAllTask(String name,String priority,Long idStatus) {
+    public ApiRes getAllTask(String name,String priority,Long idStatus,int page, int limit) {
         try {
-            List<Task> taskList = taskRepository.getAllTask(name, priority, idStatus);
+            Pageable pageable = PageRequest.of(page -1, limit);
+            List<Task> taskList = taskRepository.getAllTask(name, priority, idStatus,pageable);
             List<TaskRes> taskResList = taskList.stream().map(TaskMapping::mapEntityToRes).toList();
             return new ApiRes(true, "Lấy dữ liệu thành công", taskResList);
         } catch (Exception e) {

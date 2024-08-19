@@ -13,6 +13,8 @@ import com.example.back.repository.TaskRepository;
 import com.example.back.service.interf.StatusService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -27,9 +29,10 @@ public class StatusImpl implements StatusService {
     private final SubTaskRepository subTaskRepository;
 
     @Override
-    public ApiRes getAllStatus(String name) {
+    public ApiRes getAllStatus(String name,int page,int limit) {
         try {
-            List<Status> statusList = statusRepository.getAllStatus(name);
+            Pageable pageable = PageRequest.of(page -1, limit);
+            List<Status> statusList = statusRepository.getAllStatus(name,pageable);
             List<StatusRes> statusResList = statusList.stream().map(StatusMapping::mapEntityToRes).toList();
             return new ApiRes(true, "Lấy dữ liệu thành công", statusResList);
 
