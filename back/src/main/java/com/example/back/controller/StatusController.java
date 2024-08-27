@@ -16,7 +16,7 @@ public class StatusController {
     @GetMapping("/getAll")
     public ResponseEntity<ApiRes> getAllStatus(@RequestParam(name = "name",defaultValue = "") String name,
                                                @RequestParam(name="page",defaultValue = "1") int page,
-                                               @RequestParam(name = "limit",defaultValue = "3")int limit){
+                                               @RequestParam(name = "limit",required = false)Integer limit){
         return ResponseEntity.ok(statusService.getAllStatus(name,page,limit));
     }
     @PostMapping("/create")

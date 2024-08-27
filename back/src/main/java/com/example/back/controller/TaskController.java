@@ -19,7 +19,7 @@ public class TaskController {
                                              @RequestParam(defaultValue = "") String priority,
                                              @RequestParam(required = false)  Long idStatus,
                                              @RequestParam(name="page",defaultValue = "1") int page,
-                                             @RequestParam(name = "limit",defaultValue = "3")int limit
+                                             @RequestParam(name = "limit",required = false)Integer limit
                                              ) {
         return ResponseEntity.ok(taskService.getAllTask(name, priority, idStatus,page,limit));
     }

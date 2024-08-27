@@ -19,10 +19,21 @@ public class SubTaskController {
     public ResponseEntity<ApiRes> getAllSubTask(@RequestParam(defaultValue = "") String name,
                                                 @RequestParam(defaultValue = "") String priority,
                                                 @RequestParam(required = false) Long idStatus,
-                                                @RequestParam(name="page",defaultValue = "1") int page,
-                                                @RequestParam(name = "limit",defaultValue = "3")int limit
-                                                ) {
-        return ResponseEntity.ok(subTaskService.getAllSubTask(name, priority, idStatus,page,limit));
+                                                @RequestParam(name = "page", defaultValue = "1") int page,
+                                                @RequestParam(name = "limit", defaultValue = "3") int limit
+    ) {
+        return ResponseEntity.ok(subTaskService.getAllSubTask(name, priority, idStatus, page, limit));
+    }
+
+    @GetMapping("/getbyidtask/{id}")
+    public ResponseEntity<ApiRes> getAllSubTaskById(@PathVariable Long id,
+                                                    @RequestParam(defaultValue = "") String name,
+                                                    @RequestParam(defaultValue = "") String priority,
+                                                    @RequestParam(required = false) Long idStatus,
+                                                    @RequestParam(name = "page", defaultValue = "1") int page,
+                                                    @RequestParam(name = "limit", defaultValue = "3") int limit
+    ) {
+        return ResponseEntity.ok(subTaskService.getAllSubTaskById(id, name, priority, idStatus, page, limit));
     }
 
     @PostMapping("/create")

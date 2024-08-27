@@ -9,4 +9,6 @@ public interface SubTaskService {
     ApiRes createSubTask(SubTaskReq subTaskReq);
     ApiRes updateSubTask(Long id,SubTaskReq subTaskReq);
     ApiRes deleteSubTask(Long id);
+
+    ApiRes getAllSubTaskById(Long id,String name,String priority,Long idStatus,int page,int limit);
 }

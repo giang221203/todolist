@@ -30,6 +30,7 @@ public class TaskMapping {
         taskRes.setCreatedAt(task.getCreatedAt());
         taskRes.setUpdatedAt(task.getUpdatedAt());
         taskRes.setStatus(task.getStatus());
+        taskRes.setSubtasks(task.getSubtasks());
         return taskRes;
     }
 
