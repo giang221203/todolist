@@ -29,10 +29,16 @@ public class StatusImpl implements StatusService {
     private final SubTaskRepository subTaskRepository;
 
     @Override
-    public ApiRes getAllStatus(String name,int page,int limit) {
+    public ApiRes getAllStatus(String name,int page,Integer limit) {
         try {
-            Pageable pageable = PageRequest.of(page -1, limit);
-            List<Status> statusList = statusRepository.getAllStatus(name,pageable);
+            List<Status> statusList;
+            if (limit == null) {
+                statusList = statusRepository.getAllStatus(name);
+            } else {
+                Pageable pageable = PageRequest.of(page -1, limit);
+                statusList = statusRepository.getAllStatus(name,pageable);
+            }
+
             List<StatusRes> statusResList = statusList.stream().map(StatusMapping::mapEntityToRes).toList();
             return new ApiRes(true, "Lấy dữ liệu thành công", statusResList);
 

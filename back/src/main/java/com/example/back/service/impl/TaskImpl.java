@@ -27,10 +27,16 @@ public class TaskImpl implements TaskService {
     public final StatusRepository statusRepository;
 
     @Override
-    public ApiRes getAllTask(String name,String priority,Long idStatus,int page, int limit) {
+    public ApiRes getAllTask(String name,String priority,Long idStatus,int page, Integer limit) {
         try {
-            Pageable pageable = PageRequest.of(page -1, limit);
-            List<Task> taskList = taskRepository.getAllTask(name, priority, idStatus,pageable);
+            List<Task> taskList;
+            if(limit==null){
+                taskList = taskRepository.getAllTask(name, priority, idStatus);
+            }else {
+                Pageable pageable = PageRequest.of(page -1, limit);
+                taskList = taskRepository.getAllTask(name, priority, idStatus,pageable);
+            }
+
             List<TaskRes> taskResList = taskList.stream().map(TaskMapping::mapEntityToRes).toList();
             return new ApiRes(true, "Lấy dữ liệu thành công", taskResList);
         } catch (Exception e) {
@@ -42,7 +48,7 @@ public class TaskImpl implements TaskService {
     public ApiRes createTask(TaskReq taskReq) {
         try {
             Task taskCreate = TaskMapping.mapReqToEntity(taskReq);
-            Optional<Status> status = statusRepository.findById(taskReq.getId_status());
+            Optional<Status> status = statusRepository.findById(taskReq.getIdStatus());
             taskCreate.setCreatedAt(LocalDateTime.now());
             taskCreate.setStatus(status.get());
             if(status.get().getName().equals("done")){
@@ -68,7 +74,7 @@ public class TaskImpl implements TaskService {
             if (taskById.isPresent()) {
                 Task taskUpdate = TaskMapping.mapReqToEntity(taskReq);
                 taskUpdate.setId(id);
-                Optional<Status> status = statusRepository.findById(taskReq.getId_status());
+                Optional<Status> status = statusRepository.findById(taskReq.getIdStatus());
                 Optional<Status> statusDone = statusRepository.findById(2L);
                 taskUpdate.setStatus(status.get());
                 if(status.get().getName().equals("done")){

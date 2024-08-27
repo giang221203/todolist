@@ -1,0 +1,79 @@
+<div class="status">
+    <h1>Danh sách status</h1>
+    <div class="flex justify-content-between mb-8">
+        <p-button (onClick)="showDialog()" label="Create" />
+        <p-dialog header="Thêm mới status" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
+            <div class="flex align-items-center gap-3 mb-3">
+                <label for="username" class="font-semibold w-6rem">Name</label>
+                <input [(ngModel)]="status.name" pInputText id="username" class="flex-auto" autocomplete="off" />
+            </div>
+            <div class="flex align-items-center gap-3 mb-5">
+                <label for="email" class="font-semibold w-6rem">Description</label>
+                <textarea rows="5" cols="30" pInputTextarea [(ngModel)]="status.description">
+</textarea>
+            </div>
+            <div class="flex justify-content-end gap-2">
+                <p-button label="Cancel" severity="secondary" (onClick)="visible = false" />
+
+                <p-button label="Save" (onClick)="createStatus()" class="p-button-success" />
+            </div>
+        </p-dialog>
+        <p-iconField iconPosition="left">
+            <p-inputIcon styleClass="pi pi-search" (click)="getAllStatus()" />
+            <input type="text" pInputText placeholder="Search" [(ngModel)]="nameStatus" />
+        </p-iconField>
+    </div>
+
+    <div class="card">
+        <p-table [value]="statusList" [paginator]="true" [rows]="1" [tableStyle]="{ 'min-width': '50rem' }"
+            [rowsPerPageOptions]="[1,3,4,5 ,8, 10]" (onPage)="onLimitChange($event)">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th style="width:15%;text-align: center;">STT</th>
+                    <th style="width:20%;text-align: center;">Name</th>
+                    <th style="width:20%;text-align: center;">IsDefault</th>
+                    <th style="width:25%;text-align: center;">Description</th>
+                    <th style="width:20%;text-align: center;">Action</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-listStatus let-i="rowIndex">
+                <tr>
+                    <td style="width:15%;text-align: center;">{{i + 1}}</td>
+                    <td style="width:15%;text-align: center;">{{ listStatus.name }}</td>
+                    <td style="width:15%;text-align: center;">{{ listStatus.isDefault }}</td>
+                    <td style="width:15%;text-align: center;">{{ listStatus.description }}</td>
+                    <td style="width:15%;text-align: center;">
+                        <button pButton pRipple type="button" icon="pi pi-pen-to-square"
+                            class="p-button-rounded p-button-text p-button-success" (click)="getStatusById(listStatus)">
+                        </button>
+
+                        <button pButton pRipple type="button" icon="pi pi-trash"
+                            class="p-button-rounded p-button-text p-button-danger"
+                            (click)="deleteStatus(listStatus.id)">
+                        </button>
+                    </td>
+
+                </tr>
+            </ng-template>
+
+        </p-table>
+        <p-dialog header="Cập nhật status" [modal]="true" [(visible)]="visibleUpdate" [style]="{ width: '25rem' }">
+            <div class="flex align-items-center gap-3 mb-3">
+                <label for="username" class="font-semibold w-6rem">Name</label>
+                <input [(ngModel)]="status.name" pInputText id="username" class="flex-auto" autocomplete="off" />
+            </div>
+            <div class="flex align-items-center gap-3 mb-5">
+                <label for="email" class="font-semibold w-6rem">Description</label>
+                <textarea rows="5" cols="30" pInputTextarea [(ngModel)]="status.description">
+                        </textarea>
+            </div>
+            <div class="flex justify-content-end gap-2">
+
+                <p-button label="Cancel" severity="secondary" (onClick)="visibleUpdate = false" />
+                <p-button label="Save" (onClick)="updateStatus()" class="p-button-success" />
+            </div>
+        </p-dialog>
+    </div>
+</div>
+
+<p-toast></p-toast>

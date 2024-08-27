@@ -11,4 +11,7 @@ import java.util.List;
 public interface SubTaskRepository extends JpaRepository<SubTask,Long> {
     @Query("select st from SubTask st where st.name like %:name% and st.priority like %:priority% and ( :idStatus is null or st.status.id = :idStatus )")
     List<SubTask> getAllSubTask(String name, String priority, Long idStatus, Pageable pageable);
+
+    @Query("select st from SubTask st where st.task.id = :id and st.name like %:name% and st.priority like %:priority% and ( :idStatus is null or st.status.id = :idStatus )")
+    List<SubTask> getAllSubTaskById(Long id,String name, String priority, Long idStatus, Pageable pageable);
 }

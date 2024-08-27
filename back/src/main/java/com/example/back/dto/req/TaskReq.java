@@ -14,5 +14,5 @@ public class TaskReq {
     private String name;
     private String description;
     private String priority;
-    private Long id_status;
+    private Long idStatus;
 }
