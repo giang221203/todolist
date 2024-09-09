@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { IApiResTask, ITask } from '../interface/task.interface';
@@ -13,26 +13,32 @@ export class TaskService {
     priority: string,
     idStatus: number,
     page: number,
-    limit: number | undefined
+    limit: number | undefined,
+    createTime: string | null,
+    updateTime: string | null
   ): Observable<IApiResTask> {
-    if (idStatus == null || idStatus == undefined) {
-      if (limit == null || limit == undefined) {
-        return this.http.get<IApiResTask>(
-          `http://localhost:8080/api/v1/task/getAll?name=${name}&priority=${priority}&page=${page}`
-        );
-      } else {
-        return this.http.get<IApiResTask>(
-          `http://localhost:8080/api/v1/task/getAll?name=${name}&priority=${priority}&page=${page}&limit=${limit}`
-        );
-      }
+    let params = new HttpParams();
+
+    params = params
+      .set('name', name)
+      .set('priority', priority)
+      .set('page', page);
+    if (idStatus) {
+      params = params.set('idStatus', idStatus);
     }
-    if (limit == null || limit == undefined) {
-      return this.http.get<IApiResTask>(
-        `http://localhost:8080/api/v1/task/getAll?name=${name}&priority=${priority}&idStatus=${idStatus}&page=${page}`
-      );
+    if (limit) {
+      params = params.set('limit', limit);
     }
+    if (createTime) {
+      params = params.set('createTime', createTime);
+    }
+    if (updateTime) {
+      params = params.set('updateTime', updateTime);
+    }
+
     return this.http.get<IApiResTask>(
-      `http://localhost:8080/api/v1/task/getAll?name=${name}&priority=${priority}&idStatus=${idStatus}&page=${page}&limit=${limit}`
+      `http://localhost:8080/api/v1/task/getAll`,
+      { params }
     );
   }
   createTask(task: Omit<ITask, 'id'>): Observable<IApiResTask> {

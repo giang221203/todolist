@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
+import { Component } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { TaskComponent } from './component/task/task.component';
@@ -23,6 +23,10 @@ import { DialogModule } from 'primeng/dialog';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { ToastModule } from 'primeng/toast';
 import { SubtaskComponent } from './component/subtask/subtask.component';
+import { RouterLinkActive } from '@angular/router';
+import { CalendarModule } from 'primeng/calendar';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 @NgModule({
   declarations: [
     AppComponent,
@@ -50,8 +54,12 @@ import { SubtaskComponent } from './component/subtask/subtask.component';
     DialogModule,
     InputTextareaModule,
     ToastModule,
+    RouterLinkActive,
+    CalendarModule,
+    InputTextModule,
+    ConfirmDialogModule,
   ],
-  providers: [DatePipe],
+  providers: [DatePipe, ConfirmationService, MessageService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

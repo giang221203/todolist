@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+
 @RestController
 @RequiredArgsConstructor
 @CrossOrigin
@@ -20,9 +22,11 @@ public class SubTaskController {
                                                 @RequestParam(defaultValue = "") String priority,
                                                 @RequestParam(required = false) Long idStatus,
                                                 @RequestParam(name = "page", defaultValue = "1") int page,
-                                                @RequestParam(name = "limit", defaultValue = "3") int limit
+                                                @RequestParam(name = "limit", defaultValue = "3") int limit,
+                                                @RequestParam(name = "createTime",required = false) LocalDate createTime,
+                                                @RequestParam(name = "updateTime",required = false) LocalDate updateTime
     ) {
-        return ResponseEntity.ok(subTaskService.getAllSubTask(name, priority, idStatus, page, limit));
+        return ResponseEntity.ok(subTaskService.getAllSubTask(name, priority, idStatus, page, limit,createTime,updateTime));
     }
 
     @GetMapping("/getbyidtask/{id}")
@@ -31,9 +35,11 @@ public class SubTaskController {
                                                     @RequestParam(defaultValue = "") String priority,
                                                     @RequestParam(required = false) Long idStatus,
                                                     @RequestParam(name = "page", defaultValue = "1") int page,
-                                                    @RequestParam(name = "limit", defaultValue = "3") int limit
+                                                    @RequestParam(name = "limit", defaultValue = "3") int limit,
+                                                    @RequestParam(name = "createTime",required = false) LocalDate createTime,
+                                                    @RequestParam(name = "updateTime",required = false) LocalDate updateTime
     ) {
-        return ResponseEntity.ok(subTaskService.getAllSubTaskById(id, name, priority, idStatus, page, limit));
+        return ResponseEntity.ok(subTaskService.getAllSubTaskById(id, name, priority, idStatus, page, limit,createTime,updateTime));
     }
 
     @PostMapping("/create")

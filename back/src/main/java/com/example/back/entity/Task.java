@@ -33,7 +33,7 @@ public class Task {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "task")
+    @OneToMany(mappedBy = "task",cascade = CascadeType.ALL)
     private List<SubTask> subtasks;
 
     @ManyToOne

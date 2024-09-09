@@ -16,20 +16,27 @@
         </div>
         <div class="flex justify-content-between mb-8">
             <p-button (onClick)="showAddSubTask()" label="Create" />
-
             <div class="card flex justify-content-center">
-                <p-dropdown [options]="statusList" [(ngModel)]="idStatusOfTheSubTask" optionLabel="name"
-                    optionValue="id" placeholder="Select a status"
-                    (onChange)="getAllSubTaskById(taskDetail?.id,this.nameSubTask,this.prioritySubTask,this.idStatusOfTheSubTask, this.pageSubTask, this.limitSubTask)" />
+                <p-calendar [(ngModel)]="createTime" dateFormat="dd/mm/yy" [showClear]="true"
+                    (onSelect)="searchCreateTime()" (onClear)="searchCreateTime()" placeholder="Select  date" />
+            </div>
+            <div class="card flex justify-content-center">
+                <p-calendar [(ngModel)]="updateTime" dateFormat="dd/mm/yy" [showClear]="true"
+                    (onSelect)="searchUpdateTime()" (onClear)="searchUpdateTime()" placeholder="Select date" />
+            </div>
+            <div class="card flex justify-content-center">
+                <p-dropdown [options]="statusList" [showClear]="true" [(ngModel)]="idStatusOfTheSubTask"
+                    optionLabel="name" optionValue="id" placeholder="Select a status" (onChange)="getAllSubTaskById(taskDetail?.id,nameSubTask,prioritySubTask,idStatusOfTheSubTask, pageSubTask, limitSubTask,formatTimeReq(createTime),
+      formatTimeReq(updateTime))" />
             </div>
             <p-iconField iconPosition="left">
                 <p-inputIcon styleClass="pi pi-search"
-                    (click)="getAllSubTaskById(taskDetail?.id,this.nameSubTask,this.prioritySubTask,this.idStatusOfTheSubTask, this.pageSubTask, this.limitSubTask)" />
+                    (click)="getAllSubTaskById(taskDetail?.id,nameSubTask,prioritySubTask,idStatusOfTheSubTask, pageSubTask, limitSubTask,formatTimeReq(createTime),formatTimeReq(updateTime))" />
                 <input type="text" pInputText placeholder="Nhập vào tên" [(ngModel)]="nameSubTask" />
             </p-iconField>
             <p-iconField iconPosition="left">
                 <p-inputIcon styleClass="pi pi-search"
-                    (click)="getAllSubTaskById(taskDetail?.id,this.nameSubTask,this.prioritySubTask,this.idStatusOfTheSubTask, this.pageSubTask, this.limitSubTask)" />
+                    (click)="getAllSubTaskById(taskDetail?.id,nameSubTask,prioritySubTask,idStatusOfTheSubTask, pageSubTask, limitSubTask,formatTimeReq(createTime),formatTimeReq(updateTime))" />
                 <input type="text" pInputText placeholder="Nhập vào priority" [(ngModel)]="prioritySubTask" />
             </p-iconField>
         </div>
@@ -63,51 +70,25 @@
                             {{ formatDateTime(listSubTask.updatedAt) }}
                         </td>
                         <td style="text-align: center">{{ listSubTask.status.name }}</td>
-                        <!-- <td style="text-align: center">
+                        <td style="text-align: center">
                             <button pButton pRipple type="button" icon="pi pi-pen-to-square"
                                 class="p-button-rounded p-button-text p-button-success"
-                                (click)="getTaskById(listTask)"></button>
+                                (click)="getSubTaskById(listSubTask)"></button>
                             <button pButton pRipple type="button" icon="pi pi-trash"
                                 class="p-button-rounded p-button-text p-button-danger"
-                                (click)="deleteTask(listTask.id)"></button>
-                        </td> -->
+                                (click)="deleteSubTask(listSubTask.id)"></button>
+                        </td>
                     </tr>
                 </ng-template>
             </p-table>
-            <!-- <p-dialog header="Cập nhật task" [modal]="true" [(visible)]="visibleUpdate" [style]="{ width: '25rem' }">
-                <div class="flex align-items-center gap-3 mb-3">
-                    <label for="username" class="font-semibold w-6rem">Name</label>
-                    <input [(ngModel)]="task.name" pInputText id="username" class="flex-auto" autocomplete="off" />
-                </div>
-                <div class="flex align-items-center gap-3 mb-3">
-                    <label for="username" class="font-semibold w-6rem">Priority</label>
-                    <input [(ngModel)]="task.priority" pInputText id="username" class="flex-auto" autocomplete="off" />
-                </div>
-                <div class="flex align-items-center gap-3 mb-3">
-                    <label for="username" class="font-semibold w-6rem">Status</label>
-                    <div class="card flex justify-content-center">
-                        <p-dropdown [options]="statusList" [(ngModel)]="task.idStatus" optionLabel="name"
-                            optionValue="id" placeholder="Select a status" />
-                    </div>
-                </div>
-                <div class="flex align-items-center gap-3 mb-5">
-                    <label for="email" class="font-semibold w-6rem">Description</label>
-                    <textarea rows="5" cols="30" pInputTextarea [(ngModel)]="task.description">
-    </textarea>
-                </div>
-                <div class="flex justify-content-end gap-2">
-                    <p-toast />
-                    <p-button label="Cancel" severity="secondary" (onClick)="visibleUpdate = false" />
-                    <p-button label="Save" (onClick)="updateTask()" class="p-button-success" />
-                </div>
-            </p-dialog> -->
         </div>
     </p-dialog>
 </div>
 
+<!-- Thêm mới subtask -->
 
-
-<p-dialog header="Thêm mới subtask" [modal]="true" [(visible)]="addSubTask" [style]="{ width: '25rem' }">
+<p-dialog header="Thêm mới subtask" [modal]="true" [(visible)]="addSubTask" (onHide)="clearFormSubTask()"
+    [style]="{ width: '25rem' }">
     <div class="flex align-items-center gap-3 mb-3">
         <label for="username" class="font-semibold w-6rem">Tên</label>
         <input [(ngModel)]="subTask.name" pInputText id="username" class="flex-auto" autocomplete="off" />
@@ -119,16 +100,16 @@
     <div class="flex align-items-center  gap-5 mb-3">
         <label for="username" class="font-semibold mr-1">Status</label>
         <div class="card flex justify-content-center">
-            <p-dropdown [options]="statusList" [(ngModel)]="selectedStatus" optionLabel="name"
-                placeholder="Select a status" (onChange)="subTask.idStatus = selectedStatus.id" />
+            <p-dropdown [options]="statusList" [(ngModel)]="subTask.idStatus" optionValue="id" optionLabel="name"
+                placeholder="Select a status" />
         </div>
 
     </div>
     <div class="flex align-items-center  gap-5 mb-3">
         <label for="username" class="font-semibold mr-1">Task</label>
         <div class="card flex justify-content-center">
-            <p-dropdown [options]="taskList" [(ngModel)]="selectedTask" optionLabel="name" placeholder="Select a status"
-                (onChange)="subTask.idTask= selectedTask.id" />
+            <p-dropdown [options]="taskList" [disabled]="true" [(ngModel)]="subTask.idTask" optionValue="id"
+                optionLabel="name" placeholder="Select a subtask" />
         </div>
 
     </div>
@@ -142,3 +123,48 @@
         <p-button label="Save" (onClick)="createSubTask()" class="p-button-success" />
     </div>
 </p-dialog>
+
+
+
+
+<!-- Cập nhật subtask -->
+
+<p-dialog header="Cập nhật subtask" [modal]="true" [(visible)]="visibleUpdateSubTask" (onHide)="clearFormSubTask()"
+    [style]="{ width: '25rem' }">
+    <div class="flex align-items-center gap-3 mb-3">
+        <label for="username" class="font-semibold w-6rem">Name</label>
+        <input [(ngModel)]="subTask.name" pInputText id="username" class="flex-auto" autocomplete="off" />
+    </div>
+    <div class="flex align-items-center gap-3 mb-3">
+        <label for="username" class="font-semibold w-6rem">Priority</label>
+        <input [(ngModel)]="subTask.priority" pInputText id="username" class="flex-auto" autocomplete="off" />
+    </div>
+    <div class="flex align-items-center gap-3 mb-3">
+        <label for="username" class="font-semibold w-6rem">Status</label>
+        <div class="card flex justify-content-center">
+            <p-dropdown [options]="statusList" [(ngModel)]="subTask.idStatus" optionLabel="name" optionValue="id"
+                placeholder="Select a status" />
+        </div>
+    </div>
+    <div class="flex align-items-center  gap-5 mb-3">
+        <label for="username" class="font-semibold mr-1">Task</label>
+        <div class="card flex justify-content-center">
+            <p-dropdown [options]="taskList" [(ngModel)]="subTask.idTask" [disabled]="true" optionLabel="name"
+                optionValue="id" placeholder="Select a task" />
+        </div>
+
+    </div>
+    <div class="flex align-items-center gap-3 mb-5">
+        <label for="email" class="font-semibold w-6rem">Description</label>
+        <textarea rows="5" cols="30" pInputTextarea [(ngModel)]="subTask.description">
+    </textarea>
+    </div>
+    <div class="flex justify-content-end gap-2">
+
+        <p-button label="Cancel" severity="secondary" (onClick)="visibleUpdateSubTask = false" />
+        <p-button label="Save" (onClick)="updateSubTask()" class="p-button-success" />
+    </div>
+</p-dialog>
+
+
+<p-toast />

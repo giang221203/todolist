@@ -3,8 +3,8 @@ export interface ISubTask {
   name: string;
   description: string;
   priority: string;
-  idStatus: number;
-  idTask: number;
+  idStatus: number | null;
+  idTask: number | null;
 }
 
 export interface IApiResSubTask {

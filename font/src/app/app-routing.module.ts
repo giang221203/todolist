@@ -4,13 +4,13 @@ import { TaskComponent } from './component/task/task.component';
 import { StatusComponent } from './component/status/status.component';
 
 const routes: Routes = [
-  {path:'',redirectTo:'task',pathMatch:'full'},
-  {path:'task',component:TaskComponent},
-  {path:'status',component:StatusComponent}
+  { path: '', redirectTo: 'task', pathMatch: 'full' },
+  { path: 'task', component: TaskComponent },
+  { path: 'status', component: StatusComponent },
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

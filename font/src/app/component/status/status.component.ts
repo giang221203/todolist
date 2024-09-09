@@ -13,7 +13,7 @@ export class StatusComponent {
   statusList: IStatus[] = [];
   nameStatus: string = '';
   page: number = 1;
-  limit: number = 1;
+  limit!: number;
   status: IStatus = {
     id: 0,
     name: '',
@@ -35,6 +35,8 @@ export class StatusComponent {
     this.getAllStatus();
   }
   getAllStatus() {
+    console.log(this.limit);
+
     this.statusService
       .getAllStatus(this.nameStatus, this.page, this.limit)
       .subscribe((data) => {
@@ -56,16 +58,24 @@ export class StatusComponent {
 
   // Add
   createStatus() {
-    this.statusService.createStatus(this.status).subscribe((data) => {
-      this.getAllStatus();
+    if (this.status.name == '' || this.status.description == '') {
       this.messageService.add({
-        severity: data.status ? 'success' : 'error',
-        summary: 'Success',
-        detail: data.message,
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Vui lòng nhập đầy đủ thông tin',
       });
-      this.visible = false;
-      this.clearForm();
-    });
+    } else {
+      this.statusService.createStatus(this.status).subscribe((data) => {
+        this.getAllStatus();
+        this.messageService.add({
+          severity: data.status ? 'success' : 'error',
+          summary: data.status ? 'Success' : 'Error',
+          detail: data.message,
+        });
+        this.visible = false;
+        this.clearForm();
+      });
+    }
   }
 
   // modal
@@ -77,16 +87,24 @@ export class StatusComponent {
     this.visibleUpdate = true;
   }
   updateStatus() {
-    this.statusService.updateStatus(this.status).subscribe((data) => {
+    if (this.status.name == '' || this.status.description == '') {
       this.messageService.add({
-        severity: data.status ? 'success' : 'error',
-        summary: 'Success',
-        detail: data.message,
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Vui lòng nhập đầy đủ thông tin',
       });
-      this.getAllStatus();
-      this.visibleUpdate = false;
-      this.clearForm();
-    });
+    } else {
+      this.statusService.updateStatus(this.status).subscribe((data) => {
+        this.messageService.add({
+          severity: data.status ? 'success' : 'error',
+          summary: data.status ? 'Success' : 'Error',
+          detail: data.message,
+        });
+        this.getAllStatus();
+        this.visibleUpdate = false;
+        this.clearForm();
+      });
+    }
   }
   // delete
   deleteStatus(id: number) {

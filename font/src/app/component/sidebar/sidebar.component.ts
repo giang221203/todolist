@@ -1,4 +1,3 @@
-
 import { Component } from '@angular/core';
 
 @Component({
@@ -8,7 +7,7 @@ import { Component } from '@angular/core';
 })
 export class SidebarComponent {
   items: any[] = [
-    {label:'Giang Admin',styleClass:'title'},
+    { label: 'Giang Admin', styleClass: 'title' },
     { label: 'Task', icon: 'pi pi-box', routerLink: 'task' },
     { label: 'Status', icon: 'pi pi-box', routerLink: 'status' },
   ];

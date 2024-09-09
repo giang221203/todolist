@@ -18,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,10 +32,10 @@ public class SubTaskImpl implements SubTaskService {
     public final TaskRepository taskRepository;
 
     @Override
-    public ApiRes getAllSubTask(String name,String priority,Long idStatus,int page, int limit) {
+    public ApiRes getAllSubTask(String name,String priority,Long idStatus,int page, int limit,LocalDate createTime,LocalDate updateTime) {
         try {
             Pageable pageable = PageRequest.of(page -1, limit);
-            List<SubTask> subTaskList = subTaskRepository.getAllSubTask(name, priority, idStatus,pageable);
+            List<SubTask> subTaskList = subTaskRepository.getAllSubTask(name, priority, idStatus,pageable,createTime,updateTime);
             List<SubTaskRes> subTaskResList = subTaskList.stream().map(SubTaskMapping::mapEntityToRes).toList();
             return new ApiRes(true, "Lấy dữ liệu thành công", subTaskResList);
         } catch (Exception e) {
@@ -84,9 +85,9 @@ public class SubTaskImpl implements SubTaskService {
             if (subTaskById.isPresent()) {
                 SubTask subTaskUpdate = SubTaskMapping.mapReqToEntity(subTaskReq);
                 Optional<Status> status = statusRepository.findById(subTaskReq.getIdStatus());
+                Optional<Task> taskUpdate = taskRepository.findById(subTaskReq.getIdTask());
                 Optional<Status> statusOpen = statusRepository.findById(1L);
                 Optional<Status> statusDone = statusRepository.findById(2L);
-                Optional<Task> task = taskRepository.findById(subTaskReq.getIdTask());
                 subTaskUpdate.setId(id);
                 if (status.get().getName().equals("done")) {
                     subTaskUpdate.setProgress(100F);
@@ -95,19 +96,24 @@ public class SubTaskImpl implements SubTaskService {
                 }
 
                 subTaskUpdate.setStatus(status.get());
-                subTaskUpdate.setTask(task.get());
+                subTaskUpdate.setTask(taskUpdate.get());
+
                 subTaskRepository.save(subTaskUpdate);
-                List<SubTask> soLuongSubTaskDone = task.get().getSubtasks().stream().filter(el -> el.getStatus().getName().equals("done")).toList();
-                Float tongSoLuongSubTask = Float.valueOf(task.get().getSubtasks().size());
-                Float progress = (soLuongSubTaskDone.size() / tongSoLuongSubTask) * 100;
-                if(progress != 100L){
-                    task.get().setStatus(statusOpen.get());
-                }else {
-                    task.get().setStatus(statusDone.get());
+                if(!taskUpdate.get().getSubtasks().isEmpty()){
+                    List<SubTask> soLuongSubTaskDone = taskUpdate.get().getSubtasks().stream().filter(el -> el.getStatus().getName().equals("done")).toList();
+                    Float tongSoLuongSubTask = Float.valueOf(taskUpdate.get().getSubtasks().size());
+                    Float progress = (soLuongSubTaskDone.size() / tongSoLuongSubTask) * 100;
+                    if(progress != 100L){
+                        taskUpdate.get().setStatus(statusOpen.get());
+                    }else {
+                        taskUpdate.get().setStatus(statusDone.get());
+                    }
+                    taskUpdate.get().setProgress(progress);
+                    taskRepository.save(taskUpdate.get());
                 }
-                task.get().setUpdatedAt(LocalDateTime.now());
-                task.get().setProgress(progress);
-                taskRepository.save(task.get());
+
+                taskUpdate.get().setUpdatedAt(LocalDateTime.now());
+
                 return new ApiRes(true, "Cập nhật dữ liệu thành công", null);
             } else {
                 return new ApiRes(false, "Dữ liệu không tồn tại", null);
@@ -127,15 +133,20 @@ public class SubTaskImpl implements SubTaskService {
             if (subTaskById.isPresent()) {
                 Optional<Task> task = taskRepository.findById(subTaskById.get().getTask().getId());
                 subTaskRepository.deleteById(id);
-                List<SubTask> soLuongSubTaskDone = task.get().getSubtasks().stream().filter(el -> el.getStatus().getName().equals("done")).toList();
-                Float tongSoLuongSubTask = Float.valueOf(task.get().getSubtasks().size());
-                Float progress = (soLuongSubTaskDone.size() / tongSoLuongSubTask) * 100;
-                if(progress != 100L){
-                    task.get().setStatus(statusOpen.get());
+
+                if(!task.get().getSubtasks().isEmpty()){
+                    List<SubTask> soLuongSubTaskDone = task.get().getSubtasks().stream().filter(el -> el.getStatus().getName().equals("done")).toList();
+                    Float tongSoLuongSubTask = Float.valueOf(task.get().getSubtasks().size());
+                    Float progress = (soLuongSubTaskDone.size() / tongSoLuongSubTask) * 100;
+                    task.get().setProgress(progress);
+                    if(progress != 100L){
+                        task.get().setStatus(statusOpen.get());
+                    }else {
+                        task.get().setStatus(statusDone.get());
+                    }
                 }else {
-                    task.get().setStatus(statusDone.get());
+                    task.get().setProgress(0F);
                 }
-                task.get().setProgress(progress);
                 task.get().setUpdatedAt(LocalDateTime.now());
                 taskRepository.save(task.get());
 
@@ -150,10 +161,10 @@ public class SubTaskImpl implements SubTaskService {
     }
 
     @Override
-    public ApiRes getAllSubTaskById(Long id, String name, String priority, Long idStatus, int page, int limit) {
+    public ApiRes getAllSubTaskById(Long id, String name, String priority, Long idStatus, int page, int limit, LocalDate createTime,LocalDate updateTime) {
         try {
             Pageable pageable = PageRequest.of(page -1, limit);
-            List<SubTask> subTaskListById = subTaskRepository.getAllSubTaskById(id,name, priority, idStatus,pageable);
+            List<SubTask> subTaskListById = subTaskRepository.getAllSubTaskById(id,name, priority, idStatus,pageable,createTime,updateTime);
             List<SubTaskRes> subTaskResListById = subTaskListById.stream().map(SubTaskMapping::mapEntityToRes).toList();
             return new ApiRes(true, "Lấy dữ liệu thành công", subTaskResListById);
         } catch (Exception e) {
