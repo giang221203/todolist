@@ -19,8 +19,8 @@ public class SubTaskRes {
     private String description;
     private String priority;
     private Float progress;
-    private Status status;
-    private Task task;
+    private StatusRes status;
+    private TaskRes task;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

@@ -13,7 +13,8 @@ public interface StatusRepository extends JpaRepository<Status,Long> {
     List<Status> getAllStatus(String name, Pageable pageable);
     @Query("select s from Status s where s.name like %:name%")
     List<Status> getAllStatus(String name);
-    @Query("select s from Status s where s.name = :name")
-    Optional<Status> getAllStatusByName(String name);
+
+    List<Status> getAllStatusByNameAndIdNot(String name,Long id);
+
 
 }

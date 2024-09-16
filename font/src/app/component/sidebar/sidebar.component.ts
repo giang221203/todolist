@@ -7,8 +7,16 @@ import { Component } from '@angular/core';
 })
 export class SidebarComponent {
   items: any[] = [
-    { label: 'Giang Admin', styleClass: 'title' },
-    { label: 'Task', icon: 'pi pi-box', routerLink: 'task' },
-    { label: 'Status', icon: 'pi pi-box', routerLink: 'status' },
+    {
+      label: 'Admin:  Giang',
+      style: {
+        fontWeight: 'bold',
+        fontSize: '30px',
+        marginBottom: '20px',
+        marginTop: '10px',
+      },
+    },
+    { label: 'Task', icon: 'pi pi-briefcase', routerink: 'task' },
+    { label: 'Status', icon: 'pi pi-box', routerink: 'status' },
   ];
 }

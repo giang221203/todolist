@@ -16,10 +16,10 @@ import java.util.List;
 
 public interface TaskRepository extends JpaRepository<Task,Long> {
     @Query("select t from Task t where t.name like %:name% and t.priority like %:priority%  and ( :idStatus is null or t.status.id = :idStatus ) and(:dateTime is null or FUNCTION('DATE', t.createdAt) >= :dateTime) and(:updateTime is null or FUNCTION('DATE', t.updatedAt) >= :updateTime)")
-    Page<Task> getAllTask(String name, String priority, Long idStatus, Pageable pageable, @Param("dateTime") LocalDate dateTime, LocalDate updateTime);
+    Page<Task> getAllTask(String name, String priority, Long idStatus, Pageable pageable, LocalDate dateTime, LocalDate updateTime);
     @Query("select t from Task t where t.name like %:name% and t.priority like %:priority% and ( :idStatus is null or t.status.id = :idStatus ) and(:createTime is null or FUNCTION('DATE', t.createdAt) >= :createTime) and(:updateTime is null or FUNCTION('DATE', t.updatedAt) >= :updateTime)")
     List<Task> getAllTask(String name, String priority, Long idStatus,@Param("createTime") LocalDate createTime,LocalDate updateTime);
 
 
-    List<Task> findByName(String name);
+    List<Task> findByNameAndIdNot(String name,Long id);
 }

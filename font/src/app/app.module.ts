@@ -27,6 +27,10 @@ import { RouterLinkActive } from '@angular/router';
 import { CalendarModule } from 'primeng/calendar';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { DemoComponent } from './component/demo/demo.component';
+import { MenuModule } from 'primeng/menu';
+import { TabMenuModule } from 'primeng/tabmenu';
+import { NotfoundComponent } from './component/notfound/notfound.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -34,6 +38,8 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
     StatusComponent,
     SidebarComponent,
     SubtaskComponent,
+    DemoComponent,
+    NotfoundComponent,
   ],
   imports: [
     BrowserModule,
@@ -58,6 +64,8 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
     CalendarModule,
     InputTextModule,
     ConfirmDialogModule,
+    MenuModule,
+    TabMenuModule,
   ],
   providers: [DatePipe, ConfirmationService, MessageService],
   bootstrap: [AppComponent],

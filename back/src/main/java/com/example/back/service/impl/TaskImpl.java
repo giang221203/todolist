@@ -3,10 +3,12 @@ package com.example.back.service.impl;
 import com.example.back.dto.req.TaskReq;
 import com.example.back.dto.res.ApiRes;
 import com.example.back.dto.res.ApiResPage;
+import com.example.back.dto.res.SubTaskRes;
 import com.example.back.dto.res.TaskRes;
 import com.example.back.entity.Status;
 import com.example.back.entity.SubTask;
 import com.example.back.entity.Task;
+import com.example.back.mapping.SubTaskMapping;
 import com.example.back.mapping.TaskMapping;
 import com.example.back.repository.StatusRepository;
 import com.example.back.repository.TaskRepository;
@@ -15,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -30,10 +33,10 @@ public class TaskImpl implements TaskService {
     public final StatusRepository statusRepository;
 
     @Override
-    public ApiResPage getAllTask(String name, String priority, Long idStatus, int page, Integer limit, LocalDate createTime, LocalDate updateTime) {
+    public ApiResPage getAllTask(String name, String priority, Long idStatus, int page, Integer limit, LocalDate createTime, LocalDate updateTime,String nameSort,String directionSort) {
         try {
-
-                Pageable pageable = PageRequest.of(page -1, limit);
+            Sort.Direction direction = Sort.Direction.fromString(directionSort);
+                Pageable pageable = PageRequest.of(page -1, limit, Sort.by(direction,nameSort));
             Page<Task> taskPage = taskRepository.getAllTask(name, priority, idStatus,pageable,createTime,updateTime);
 
 
@@ -47,7 +50,7 @@ public class TaskImpl implements TaskService {
     @Override
     public ApiRes createTask(TaskReq taskReq) {
         try {
-            if(!taskRepository.findByName(taskReq.getName()).isEmpty()){
+            if(!taskRepository.findByNameAndIdNot(taskReq.getName(),0L).isEmpty()){
                 return new ApiRes(false,"Tên task đã tồn tại",null);
             }
             Task taskCreate = TaskMapping.mapReqToEntity(taskReq);
@@ -75,6 +78,9 @@ public class TaskImpl implements TaskService {
         try {
             Optional<Task> taskById = taskRepository.findById(id);
             if (taskById.isPresent()) {
+                if(!taskRepository.findByNameAndIdNot(taskReq.getName(),id).isEmpty()){
+                    return new ApiRes(false,"Tên task đã tồn tại",null);
+                }
                 Task taskUpdate = TaskMapping.mapReqToEntity(taskReq);
                 Optional<Status> status = statusRepository.findById(taskReq.getIdStatus());
                 Optional<Status> statusDone = statusRepository.findById(2L);
@@ -130,6 +136,23 @@ public class TaskImpl implements TaskService {
             }
         } catch (Exception e) {
             return new ApiRes(false, e.getMessage(), null);
+        }
+    }
+
+    @Override
+    public ApiRes getTaskById(Long id) {
+        try {
+            Optional<Task>  taskbyId = taskRepository.findById(id);
+            if(taskbyId.isPresent()){
+                TaskRes taskRes = TaskMapping.mapEntityToRes(taskbyId.get());
+                List<TaskRes>taskResList = new ArrayList<>();
+                taskResList.add(taskRes);
+                return new ApiRes(true,"Đã tìm thấy dữ liệu",taskResList);
+            }else {
+                return new ApiRes(true,"Dữ liệu không tồn tại",null);
+            }
+        }catch (Exception e){
+            return new ApiRes(false,e.getMessage(),null);
         }
     }
 }

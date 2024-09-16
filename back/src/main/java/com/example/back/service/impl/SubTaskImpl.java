@@ -2,6 +2,7 @@ package com.example.back.service.impl;
 
 import com.example.back.dto.req.SubTaskReq;
 import com.example.back.dto.res.ApiRes;
+import com.example.back.dto.res.ApiResPage;
 import com.example.back.dto.res.SubTaskRes;
 import com.example.back.dto.res.TaskRes;
 import com.example.back.entity.Status;
@@ -14,8 +15,10 @@ import com.example.back.repository.SubTaskRepository;
 import com.example.back.repository.TaskRepository;
 import com.example.back.service.interf.SubTaskService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -161,14 +164,32 @@ public class SubTaskImpl implements SubTaskService {
     }
 
     @Override
-    public ApiRes getAllSubTaskById(Long id, String name, String priority, Long idStatus, int page, int limit, LocalDate createTime,LocalDate updateTime) {
+    public ApiRes getSubTaskById(Long id) {
         try {
-            Pageable pageable = PageRequest.of(page -1, limit);
-            List<SubTask> subTaskListById = subTaskRepository.getAllSubTaskById(id,name, priority, idStatus,pageable,createTime,updateTime);
-            List<SubTaskRes> subTaskResListById = subTaskListById.stream().map(SubTaskMapping::mapEntityToRes).toList();
-            return new ApiRes(true, "Lấy dữ liệu thành công", subTaskResListById);
+            Optional<SubTask>  subTaskbyId = subTaskRepository.findById(id);
+            if(subTaskbyId.isPresent()){
+                SubTaskRes subTaskRes = SubTaskMapping.mapEntityToRes(subTaskbyId.get());
+                List<SubTaskRes> subTaskResList = new ArrayList<>();
+                subTaskResList.add(subTaskRes);
+                return new ApiRes(true,"Đã tìm thấy dữ liệu",subTaskResList);
+            }else {
+                return new ApiRes(true,"Dữ liệu không tồn tại",null);
+            }
+        }catch (Exception e){
+            return new ApiRes(false,e.getMessage(),null);
+        }
+    }
+
+    @Override
+    public ApiResPage getAllSubTaskById(Long id, String name, String priority, Long idStatus, int page, int limit, LocalDate createTime, LocalDate updateTime,String nameSort, String directionSort) {
+        try {
+            Sort.Direction direction = Sort.Direction.fromString(directionSort);
+            Pageable pageable = PageRequest.of(page -1, limit,Sort.by(direction,nameSort));
+            Page<SubTask> subtaskPageById = subTaskRepository.getAllSubTaskById(id,name, priority, idStatus,pageable,createTime,updateTime);
+            List<SubTaskRes> subTaskResListById = subtaskPageById.getContent().stream().map(SubTaskMapping::mapEntityToRes).toList();
+            return new ApiResPage(true, "Lấy dữ liệu thành công",subtaskPageById.getTotalElements(), subTaskResListById);
         } catch (Exception e) {
-            return new ApiRes(false, e.getMessage(), null);
+            return new ApiResPage(false, e.getMessage(),0, null);
         }
     }
 }

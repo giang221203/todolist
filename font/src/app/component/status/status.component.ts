@@ -29,13 +29,13 @@ export class StatusComponent {
   }
 
   // chuyển đổi số bản ghi trong một trang
-  onLimitChange(event: any) {
-    console.log(event);
-    this.limit = event.rows;
-    this.getAllStatus();
-  }
+  // onLimitChange(event: any) {
+  //   console.log(event);
+  //   this.limit = event.rows;
+  //   this.getAllStatus();
+  // }
   getAllStatus() {
-    console.log(this.limit);
+    // console.log(this.limit);
 
     this.statusService
       .getAllStatus(this.nameStatus, this.page, this.limit)

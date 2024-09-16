@@ -25,9 +25,15 @@ public class TaskController {
                                                  @RequestParam(name="page",defaultValue = "1") int page,
                                                  @RequestParam(name = "limit",required = false,defaultValue = "10")Integer limit,
                                                  @RequestParam(name = "createTime",required = false) LocalDate createTime,
-                                                 @RequestParam(name = "updateTime",required = false) LocalDate updateTime
+                                                 @RequestParam(name = "updateTime",required = false) LocalDate updateTime,
+                                                 @RequestParam(defaultValue = "updatedAt") String nameSort,
+                                                 @RequestParam(defaultValue = "DESC") String direction
                                              ) {
-        return ResponseEntity.ok(taskService.getAllTask(name, priority, idStatus,page,limit,createTime,updateTime));
+        return ResponseEntity.ok(taskService.getAllTask(name, priority, idStatus,page,limit,createTime,updateTime,nameSort,direction));
+    }
+    @GetMapping("/getbyid/{id}")
+    public ResponseEntity<ApiRes> getTaskById(@PathVariable Long id){
+        return ResponseEntity.ok(taskService.getTaskById(id));
     }
 
     @PostMapping("/create")

@@ -11,18 +11,22 @@ export class TaskService {
   getAllTask(
     name: string,
     priority: string,
-    idStatus: number,
+    idStatus: number | undefined,
     page: number,
     limit: number | undefined,
     createTime: string | null,
-    updateTime: string | null
+    updateTime: string | null,
+    nameSort: string,
+    directionSort: string
   ): Observable<IApiResTask> {
     let params = new HttpParams();
 
     params = params
       .set('name', name)
       .set('priority', priority)
-      .set('page', page);
+      .set('page', page)
+      .set('nameSort', nameSort)
+      .set('direction', directionSort);
     if (idStatus) {
       params = params.set('idStatus', idStatus);
     }
@@ -56,6 +60,11 @@ export class TaskService {
   deleteTask(id: number): Observable<IApiResTask> {
     return this.http.delete<IApiResTask>(
       `http://localhost:8080/api/v1/task/delete/${id}`
+    );
+  }
+  getById(id: number): Observable<IApiResTask> {
+    return this.http.get<IApiResTask>(
+      `http://localhost:8080/api/v1/task/getbyid/${id}`
     );
   }
 }

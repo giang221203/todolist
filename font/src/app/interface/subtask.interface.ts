@@ -11,4 +11,5 @@ export interface IApiResSubTask {
   status: boolean;
   message: string;
   content: ISubTask[];
+  totalElement: number;
 }

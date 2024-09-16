@@ -50,12 +50,14 @@ public class StatusImpl implements StatusService {
     @Override
     public ApiRes createStatus(StatusReq statusReq) {
         try {
-       if(statusRepository.getAllStatusByName(statusReq.getName()).isPresent()){
+       if(!statusRepository.getAllStatusByNameAndIdNot(statusReq.getName(),0L).isEmpty()){
            return new ApiRes(false,"Tên status đã tồn tại",null);
-       }
+       }else {
            Status statusCreate = StatusMapping.mapReqToEntity(statusReq);
            statusRepository.save(statusCreate);
            return new ApiRes(true, "Thêm status thành công", null);
+       }
+
 
         }catch (Exception e){
             return new ApiRes(false,e.getMessage(),null);
@@ -67,6 +69,9 @@ public class StatusImpl implements StatusService {
         try {
             Optional<Status> statusbyId = statusRepository.findById(id);
             if(statusbyId.isPresent()){
+                if(!statusRepository.getAllStatusByNameAndIdNot(statusReq.getName(),id).isEmpty()){
+                    return new ApiRes(false,"Tên status đã tồn tại",null);
+                }
                 if(statusbyId.get().getName().equals("open") || statusbyId.get().getName().equals("done")){
                     return new ApiRes(false, "Đây là trạng thái mặc định không được chỉnh sửa", null);
                 }

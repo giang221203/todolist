@@ -1,68 +1,83 @@
 <div class="task">
-    <h1 class=>Danh sách task</h1>
-    <div class="flex justify-content-around mb-8">
-        <p-button (onClick)="showDialog()" label="Create" />
+    <h1 class=>Quản lý công việc</h1>
+    <div class="flex justify-content-between mb-4">
+
         <div class="card flex justify-content-center">
-            <p-calendar [(ngModel)]="createTime" dateFormat="dd/mm/yy" [showClear]="true"
-                (onSelect)="searchCreateTime()" class="w-11rem text-sm" (onClear)="searchCreateTime()"
-                placeholder="Select  date" />
+            <p-calendar [(ngModel)]="createTime" [iconDisplay]="'input'" [showIcon]="createTime ? 'false' : 'true'"
+                dateFormat="dd/mm/yy" [showClear]="true" (onSelect)="search()" class="w-11rem text-sm"
+                (onClear)="search()" placeholder="Ngày khởi tạo" />
         </div>
         <div class="card flex justify-content-center">
-            <p-calendar [(ngModel)]="updateTime" dateFormat="dd/mm/yy" [showClear]="true"
-                (onSelect)="searchUpdateTime()" class="w-11rem text-sm" (onClear)="searchUpdateTime()"
-                placeholder="Select date" />
+            <p-calendar [(ngModel)]="updateTime" dateFormat="dd/mm/yy" [showClear]="true" [iconDisplay]="'input'"
+                [showIcon]="updateTime ? 'false' : 'true'" (onSelect)="search()" class="w-11rem text-sm"
+                (onClear)="search()" placeholder="Ngày chỉnh sửa" />
         </div>
-        <div class="card flex justify-content-center">
+        <div class="card">
             <p-dropdown [options]="statusList" [showClear]="true" [(ngModel)]="idStatusOfTheTask" optionLabel="name"
-                optionValue="id" placeholder="Select a status" class="w-11rem text-sm"
-                (onChange)="searchStatus()"></p-dropdown>
+                optionValue="id" placeholder="Chọn trạng thái" class="w-11rem text-sm"
+                (onChange)="search()"></p-dropdown>
         </div>
-        <p-iconField iconPosition="left">
+        <p-iconField iconPosition="right">
             <p-inputIcon styleClass="pi pi-search" />
-            <input type="text" pInputText placeholder="Nhập vào tên" [(ngModel)]="nameTask" class="w-11rem text-sm"
-                (change)="getAllTask(nameTask,priorityTask,idStatusOfTheTask, page, limit,createTime,updateTime)" />
+            <input type="text" pInputText placeholder="Nhập vào tên" pStyleClass="h-10rem" [(ngModel)]="nameTask"
+                class="w-11rem text-sm" (ngModelChange)="search()" />
         </p-iconField>
-        <p-iconField iconPosition="left" class="">
-            <p-inputIcon styleClass="pi pi-search"
-                (click)="getAllTask(nameTask,priorityTask,idStatusOfTheTask, page, limit,createTime,updateTime)" />
-            <input type="text" pInputText placeholder="Nhập vào priority" class="w-11rem text-sm"
-                [(ngModel)]="priorityTask" />
+        <p-iconField iconPosition="right" class="">
+            <p-inputIcon styleClass="pi pi-search" />
+            <input type="text" pInputText placeholder="Nhập sự ưu tiên" class="w-11rem text-sm"
+                [(ngModel)]="priorityTask" (ngModelChange)="search()" />
         </p-iconField>
+    </div>
+    <div class="flex justify-content-between align-items-center mb-2">
+        <h2>Danh sách công việc</h2>
+        <p-button (onClick)="showDialog()" label="Thêm mới" />
     </div>
 
     <div class="card">
-        <p-table [value]="taskList" [tableStyle]="{ 'min-width': '50rem' }">
+        <p-table [value]="taskList" styleClass="p-datatable-striped" [tableStyle]="{ 'min-width': '50rem'}">
             <ng-template pTemplate="header">
                 <tr>
                     <th style="width: 2%; padding: 1rem 0; text-align: center">STT</th>
-                    <th style="width: 15%; padding: 0; text-align: center">Name</th>
-                    <th style="width: 20%; padding: 0; text-align: center">Description</th>
-                    <th style="width: 10%; padding: 0; text-align: center">Priority</th>
-                    <th style="width: 5%; padding: 0; text-align: center">Progress</th>
-                    <th style="width: 10%; padding: 0; text-align: center">Create_at</th>
-                    <th style="width: 10%; padding: 0; text-align: center">Update_at</th>
-                    <th style="width: 10%; padding: 0; text-align: center">Status</th>
-                    <th style="width: 20%; padding: 0; text-align: center">Action</th>
+                    <th style="width: 8%; padding: 0; text-align: center">Tên <i
+                            [ngClass]="directionSort == 'DESC'&&nameSort=='name' ? 'pi pi-sort-amount-down sortActive' : directionSort == 'ASC'&&nameSort=='name'? 'pi pi-sort-amount-up-alt sortActive': 'pi pi-sort-alt'"
+                            class="pl-1 cursor-pointer sort pi-sort-alt " (click)="sort('name')"></i>
+                    </th>
+                    <th style="width: 15%; padding: 0; text-align: center">Mô tả
+                    </th>
+                    <th style="width: 10%; padding: 0; text-align: center">Độ ưu tiên </th>
+                    <th style="width: 10%; padding: 0; text-align: center">Tiến độ <i
+                            [ngClass]="directionSort == 'DESC'&&nameSort=='progress' ? 'pi pi-sort-amount-down sortActive' : directionSort == 'ASC'&&nameSort=='progress'? 'pi pi-sort-amount-up-alt sortActive': 'pi pi-sort-alt'"
+                            class="pl-1 cursor-pointer sort" (click)="sort('progress')"></i>
+                    </th>
+                    <th style="width: 12.7%; padding: 0 10px 0 0; text-align: center">Ngày khởi tạo <i
+                            [ngClass]="directionSort == 'DESC' &&nameSort=='createdAt' ? 'pi pi-sort-amount-down sortActive' : directionSort == 'ASC'&&nameSort=='createdAt'? 'pi pi-sort-amount-up-alt sortActive': 'pi pi-sort-alt'"
+                            class="pl-1 cursor-pointer sort" (click)="sort('createdAt')"></i></th>
+                    <th style="width: 12.7%; padding: 0 10px 0 0; text-align: center">Ngày cập nhật
+                        <i [ngClass]="directionSort == 'DESC' &&nameSort=='updatedAt' ? 'pi pi-sort-amount-down sortActive' : directionSort == 'ASC'&&nameSort=='updatedAt'? 'pi pi-sort-amount-up-alt sortActive': 'pi pi-sort-alt'"
+                            class="pl-1 cursor-pointer sort" (click)="sort('updatedAt')"></i>
+                    </th>
+                    <th style="width: 9%; padding: 0; text-align: center">Trạng thái </th>
+                    <th style="width: 14%; padding: 0; text-align: center">Hành động </th>
                 </tr>
             </ng-template>
-            <ng-template pTemplate="body" let-listTask let-i="rowIndex">
+            <ng-template pTemplate="body" let-listTask let-i="rowIndex" pReordera>
                 <tr>
-                    <td style="text-align: center">{{ i + 1 }}</td>
-                    <td style="text-align: center">{{ listTask.name }}</td>
-                    <td style="text-align: center">{{ listTask.description }}</td>
-                    <td style="text-align: center">{{ listTask.priority }}</td>
-                    <td style="text-align: center">{{ listTask.progress }}</td>
-                    <td style="text-align: center">
+                    <td style="text-align: center;padding: 0;">{{ i + 1 }}</td>
+                    <td style="text-align: center;padding: 0.5rem;">{{ listTask.name }}</td>
+                    <td style="text-align: center;padding: 0.5rem;">{{ listTask.description }}</td>
+                    <td style="text-align: center;padding: 0.5rem;">{{ listTask.priority }}</td>
+                    <td style="text-align: center;padding: 0.5rem;">{{ listTask.progress }}</td>
+                    <td style="text-align: center;padding: 0.5rem 2rem 0.5px 1rem; ">
                         {{ formatDateTime(listTask.createdAt) }}
                     </td>
-                    <td style="text-align: center">
+                    <td style="text-align: center;padding: 0.5rem 2rem 0.5px 1rem;">
                         {{ formatDateTime(listTask.updatedAt) }}
                     </td>
-                    <td style="text-align: center">{{ listTask.status.name }}</td>
-                    <td style="text-align: center">
+                    <td style="text-align: center;padding: 0.5rem;">{{ listTask.status.name }}</td>
+                    <td style="text-align: center;padding: 0.5rem;">
 
                         <button pButton pRipple type="button" icon="pi pi-info-circle"
-                            class="p-button-rounded p-button-text p-button-warning"
+                            class="p-button-rounded p-button-text p-button-info"
                             (click)="showSubTask(listTask)"></button>
                         <button pButton pRipple type="button" icon="pi pi-pen-to-square"
                             class="p-button-rounded p-button-text p-button-success"
@@ -82,25 +97,25 @@
 
 
         <p-dialog header="Thêm mới task" [modal]="true" [(visible)]="visible" (onHide)="clearForm()"
-            [style]="{ width: '25rem' }">
+            [style]="{ width: '30rem' }">
             <div class="flex align-items-center gap-3 mb-3">
                 <label for="username" class="font-semibold w-6rem">Tên</label>
                 <input [(ngModel)]="task.name" pInputText id="username" class="flex-auto" autocomplete="off" />
             </div>
             <div class="flex align-items-center gap-3 mb-3">
-                <label for="username" class="font-semibold w-6rem">Priority</label>
+                <label for="username" class="font-semibold w-6rem">Độ ưu tiên</label>
                 <input [(ngModel)]="task.priority" pInputText id="username" class="flex-auto" autocomplete="off" />
             </div>
-            <div class="flex align-items-center  gap-5 mb-3">
-                <label for="username" class="font-semibold mr-1">Status</label>
+            <div class="flex align-items-center  gap-3 mb-3">
+                <label for="username" class="font-semibold w-6rem">Trạng thái</label>
                 <div class="card flex justify-content-center">
                     <p-dropdown [options]="statusList" [(ngModel)]="task.idStatus" optionLabel="name" optionValue="id"
-                        placeholder="Select a status" />
+                        placeholder="Chọn trạng thái" />
                 </div>
             </div>
             <div class="flex align-items-center gap-3 mb-5">
-                <label for="email" class="font-semibold w-6rem">Description</label>
-                <textarea rows="5" cols="30" pInputTextarea [(ngModel)]="task.description"></textarea>
+                <label for="email" class="font-semibold w-6rem">Mô tả</label>
+                <textarea rows="5" cols="30" class="flex-auto" pInputTextarea [(ngModel)]="task.description"></textarea>
             </div>
             <div class="flex justify-content-end gap-2">
                 <p-button label="Cancel" severity="secondary" (onClick)="visible = false" />
@@ -114,25 +129,25 @@
 
 
         <p-dialog header="Cập nhật task" [modal]="true" [(visible)]="visibleUpdate" (onHide)="clearForm()"
-            [style]="{ width: '25rem' }">
+            [style]="{ width: '30rem' }">
             <div class="flex align-items-center gap-3 mb-3">
-                <label for="username" class="font-semibold w-6rem">Name</label>
+                <label for="username" class="font-semibold w-6rem">Tên</label>
                 <input [(ngModel)]="task.name" pInputText id="username" class="flex-auto" autocomplete="off" />
             </div>
             <div class="flex align-items-center gap-3 mb-3">
-                <label for="username" class="font-semibold w-6rem">Priority</label>
+                <label for="username" class="font-semibold w-6rem">ĐỘ ưu tiên</label>
                 <input [(ngModel)]="task.priority" pInputText id="username" class="flex-auto" autocomplete="off" />
             </div>
             <div class="flex align-items-center gap-3 mb-3">
-                <label for="username" class="font-semibold w-6rem">Status</label>
+                <label for="username" class="font-semibold w-6rem">Trạng thái</label>
                 <div class="card flex justify-content-center">
                     <p-dropdown [options]="statusList" [(ngModel)]="statusChecked" (onChange)="confirm()"
-                        optionLabel="name" optionValue="id" placeholder="Select a status" />
+                        optionLabel="name" optionValue="id" placeholder="Chọn trạng thái" />
                 </div>
             </div>
             <div class="flex align-items-center gap-3 mb-5">
-                <label for="email" class="font-semibold w-6rem">Description</label>
-                <textarea rows="5" cols="30" pInputTextarea [(ngModel)]="task.description">
+                <label for="email" class="font-semibold w-6rem">Mô tả</label>
+                <textarea rows="5" cols="30" class="flex-auto" pInputTextarea [(ngModel)]="task.description">
 </textarea>
             </div>
             <div class="flex justify-content-end gap-2">
@@ -153,5 +168,5 @@
         </div>
     </ng-template>
 </p-confirmDialog>
-<app-subtask [(subtaskModal)]="subtaskModal" [taskDetail]="taskDetail" [statusList]="statusList"
+<app-subtask [(subtaskModal)]="subtaskModal" [taskDetail]="taskDetail" [statusList]="statusList" [taskList]="taskList"
     (subtaskUpdated)="updateGetAll()"></app-subtask>

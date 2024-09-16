@@ -16,14 +16,18 @@ export class SubTaskService {
     page: number,
     limit: number | undefined,
     createTime: string | null,
-    updateTime: string | null
+    updateTime: string | null,
+    nameSort: string,
+    directionSort: string
   ): Observable<IApiResSubTask> {
     let params = new HttpParams();
 
     params = params
       .set('name', name)
       .set('priority', priority)
-      .set('page', page);
+      .set('page', page)
+      .set('nameSort', nameSort)
+      .set('direction', directionSort);
     if (idStatus) {
       params = params.set('idStatus', idStatus);
     }
@@ -56,6 +60,11 @@ export class SubTaskService {
   deleteSubTask(id: number): Observable<IApiResSubTask> {
     return this.http.delete<IApiResSubTask>(
       `http://localhost:8080/api/v1/subtask/delete/${id}`
+    );
+  }
+  getById(id: number): Observable<IApiResSubTask> {
+    return this.http.get<IApiResSubTask>(
+      `http://localhost:8080/api/v1/subtask/getbyid/${id}`
     );
   }
 }

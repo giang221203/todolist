@@ -20,7 +20,9 @@ export class TaskComponent {
   priorityTask: string = '';
   idStatusOfTheTask!: number;
   page: number = 1;
-  limit: number = 1;
+  limit: number = 4;
+  createTime!: string | null;
+  updateTime!: string | null;
   totalEL!: number;
   first: number = 0;
   taskDetail!: any;
@@ -33,6 +35,8 @@ export class TaskComponent {
   };
   limitStatus!: number;
   onSelectStatus!: IStatus;
+  directionSort: string = 'DESC';
+  nameSort: string = 'updatedAt';
   constructor(
     private taskService: TaskService,
     private messageService: MessageService,
@@ -42,6 +46,8 @@ export class TaskComponent {
   ) {}
 
   ngOnInit() {
+    console.log(this.createTime);
+
     this.getAllTask(
       this.nameTask,
       this.priorityTask,
@@ -49,7 +55,9 @@ export class TaskComponent {
       this.page,
       this.limit,
       this.formatCreateTime(this.createTime),
-      this.formatCreateTime(this.updateTime)
+      this.formatCreateTime(this.updateTime),
+      this.nameSort,
+      this.directionSort
     );
     this.getAllStatus();
   }
@@ -61,16 +69,17 @@ export class TaskComponent {
       this.page,
       this.limit,
       this.formatCreateTime(this.createTime),
-      this.formatCreateTime(this.updateTime)
+      this.formatCreateTime(this.updateTime),
+      this.nameSort,
+      this.directionSort
     );
   }
   // chuyển đổi số bản ghi trong một trang
   onLimitChange(event: any) {
-    // console.log(event);
     this.limit = event.rows;
     this.first = event.first;
-    console.log(this.first);
     this.page = this.first / this.limit + 1;
+
     this.getAllTask(
       this.nameTask,
       this.priorityTask,
@@ -78,7 +87,9 @@ export class TaskComponent {
       this.page,
       this.limit,
       this.formatCreateTime(this.createTime),
-      this.formatCreateTime(this.updateTime)
+      this.formatCreateTime(this.updateTime),
+      this.nameSort,
+      this.directionSort
     );
   }
   getAllStatus() {
@@ -95,13 +106,23 @@ export class TaskComponent {
     page: number,
     limit: number,
     createTime: string | null,
-    updateTime: string | null
+    updateTime: string | null,
+    nameSort: string,
+    direction: string
   ) {
     this.taskService
-      .getAllTask(name, priority, idStatus, page, limit, createTime, updateTime)
+      .getAllTask(
+        name,
+        priority,
+        idStatus,
+        page,
+        limit,
+        createTime,
+        updateTime,
+        nameSort,
+        direction
+      )
       .subscribe((data) => {
-        console.log(data);
-
         this.taskList = data.content;
         this.totalEL = data.totalElement;
       });
@@ -122,7 +143,9 @@ export class TaskComponent {
     this.task.description = '';
   }
 
-  searchStatus() {
+  search() {
+    this.first = 0;
+    this.page = 1;
     this.getAllTask(
       this.nameTask,
       this.priorityTask,
@@ -130,42 +153,19 @@ export class TaskComponent {
       this.page,
       this.limit,
       this.formatCreateTime(this.createTime),
-      this.formatCreateTime(this.updateTime)
+      this.formatCreateTime(this.updateTime),
+      this.nameSort,
+      this.directionSort
     );
   }
 
-  createTime!: string | null;
-  updateTime!: string | null;
-  searchCreateTime() {
-    this.getAllTask(
-      this.nameTask,
-      this.priorityTask,
-      this.idStatusOfTheTask,
-      this.page,
-      this.limit,
-      this.formatCreateTime(this.createTime),
-      this.formatCreateTime(this.updateTime)
-    );
-  }
-  searchUpdateTime() {
-    this.getAllTask(
-      this.nameTask,
-      this.priorityTask,
-      this.idStatusOfTheTask,
-      this.page,
-      this.limit,
-      this.formatCreateTime(this.createTime),
-      this.formatCreateTime(this.updateTime)
-    );
-  }
   // Add
 
   createTask() {
     if (
       this.task.name == '' ||
       this.task.priority == '' ||
-      this.task.idStatus == null ||
-      this.task.description == ''
+      this.task.idStatus == null
     ) {
       this.messageService.add({
         severity: 'error',
@@ -174,6 +174,8 @@ export class TaskComponent {
       });
     } else {
       this.taskService.createTask(this.task).subscribe((data) => {
+        this.first = 0;
+        this.page = 1;
         this.getAllTask(
           this.nameTask,
           this.priorityTask,
@@ -181,7 +183,9 @@ export class TaskComponent {
           this.page,
           this.limit,
           this.formatCreateTime(this.createTime),
-          this.formatCreateTime(this.updateTime)
+          this.formatCreateTime(this.updateTime),
+          (this.nameSort = 'updatedAt'),
+          (this.directionSort = 'DESC')
         );
         this.messageService.add({
           severity: data.status ? 'success' : 'error',
@@ -205,16 +209,13 @@ export class TaskComponent {
     this.task.idStatus = listTask.status.id;
     this.statusChecked = listTask.status.id;
     this.visibleUpdate = true;
-    console.log('dsfd', this.task.idStatus);
-    console.log('dsfd', this.statusChecked);
   }
 
   updateTask() {
     if (
       this.task.name == '' ||
       this.task.priority == '' ||
-      this.task.idStatus == null ||
-      this.task.description == ''
+      this.task.idStatus == null
     ) {
       this.messageService.add({
         severity: 'error',
@@ -228,6 +229,8 @@ export class TaskComponent {
           summary: data.status ? 'Success' : 'Error',
           detail: data.message,
         });
+        this.first = 0;
+        this.page = 1;
         this.getAllTask(
           this.nameTask,
           this.priorityTask,
@@ -235,7 +238,9 @@ export class TaskComponent {
           this.page,
           this.limit,
           this.formatCreateTime(this.createTime),
-          this.formatCreateTime(this.updateTime)
+          this.formatCreateTime(this.updateTime),
+          (this.nameSort = 'updatedAt'),
+          (this.directionSort = 'DESC')
         );
         this.visibleUpdate = false;
         this.clearForm();
@@ -244,23 +249,27 @@ export class TaskComponent {
   }
   // delete
   deleteTask(id: number) {
-    this.taskService.deleteTask(id).subscribe((data) => {
-      this.messageService.add({
-        severity: data.status ? 'success' : 'error',
-        summary: data.status ? 'Success' : 'Error',
-        detail: data.message,
+    if (confirm('Bạn muốn xoá chứ')) {
+      this.taskService.deleteTask(id).subscribe((data) => {
+        this.messageService.add({
+          severity: data.status ? 'success' : 'error',
+          summary: data.status ? 'Success' : 'Error',
+          detail: data.message,
+        });
+        this.getAllTask(
+          this.nameTask,
+          this.priorityTask,
+          this.idStatusOfTheTask,
+          this.page,
+          this.limit,
+          this.formatCreateTime(this.createTime),
+          this.formatCreateTime(this.updateTime),
+          this.nameSort,
+          this.directionSort
+        );
+        this.clearForm();
       });
-      this.getAllTask(
-        this.nameTask,
-        this.priorityTask,
-        this.idStatusOfTheTask,
-        this.page,
-        this.limit,
-        this.formatCreateTime(this.createTime),
-        this.formatCreateTime(this.updateTime)
-      );
-      this.clearForm();
-    });
+    }
   }
 
   formatDateTime(dateTime: string): string | null {
@@ -274,28 +283,62 @@ export class TaskComponent {
     this.subtaskModal = true;
     this.taskDetail = listTask;
   }
+
+  sort(nameSort: string) {
+    this.nameSort = nameSort;
+    if (this.directionSort == 'DESC') {
+      this.directionSort = 'ASC';
+    } else {
+      this.directionSort = 'DESC';
+    }
+    this.getAllTask(
+      this.nameTask,
+      this.priorityTask,
+      this.idStatusOfTheTask,
+      this.page,
+      this.limit,
+      this.formatCreateTime(this.createTime),
+      this.formatCreateTime(this.updateTime),
+      this.nameSort,
+      this.directionSort
+    );
+  }
   confirm() {
     console.log('nè');
     console.log('dsfd', this.statusChecked);
     console.log(this.task.idStatus);
-
-    this.confirmationService.confirm({
-      header: 'Cảnh báo',
-      message: `  ${
-        this.statusChecked == 2
-          ? 'Tất cả các subtask sẽ chuyển thành done nếu task done'
-          : 'Tất cả các subtask sẽ chuyển thành open nếu task chuyển trạng thái'
-      }`,
-      acceptIcon: 'pi pi-check mr-2',
-      rejectIcon: 'pi pi-times mr-2',
-      rejectButtonStyleClass: 'p-button-sm',
-      acceptButtonStyleClass: 'p-button-outlined p-button-sm',
-      accept: () => {
-        this.task.idStatus = this.statusChecked;
-      },
-      reject: () => {
-        this.statusChecked = this.task.idStatus;
-      },
-    });
+    if (this.statusChecked == 2) {
+      this.confirmationService.confirm({
+        header: 'Cảnh báo',
+        message: `Tất cả các subtask sẽ chuyển thành done nếu task done`,
+        acceptIcon: 'pi pi-check mr-2',
+        rejectIcon: 'pi pi-times mr-2',
+        rejectButtonStyleClass: 'p-button-sm',
+        acceptButtonStyleClass: 'p-button-outlined p-button-sm',
+        accept: () => {
+          this.task.idStatus = this.statusChecked;
+        },
+        reject: () => {
+          this.statusChecked = this.task.idStatus;
+        },
+      });
+    } else if (this.task.idStatus == 2 && this.statusChecked !== 2) {
+      this.confirmationService.confirm({
+        header: 'Cảnh báo',
+        message: `Tất cả các subtask sẽ chuyển thành open nếu task chuyển trạng thái`,
+        acceptIcon: 'pi pi-check mr-2',
+        rejectIcon: 'pi pi-times mr-2',
+        rejectButtonStyleClass: 'p-button-sm',
+        acceptButtonStyleClass: 'p-button-outlined p-button-sm',
+        accept: () => {
+          this.task.idStatus = this.statusChecked;
+        },
+        reject: () => {
+          this.statusChecked = this.task.idStatus;
+        },
+      });
+    } else {
+      this.task.idStatus = this.statusChecked;
+    }
   }
 }

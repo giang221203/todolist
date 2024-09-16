@@ -29,8 +29,7 @@ public class TaskMapping {
         taskRes.setDescription(task.getDescription());
         taskRes.setCreatedAt(task.getCreatedAt());
         taskRes.setUpdatedAt(task.getUpdatedAt());
-        taskRes.setStatus(task.getStatus());
-        taskRes.setSubtasks(task.getSubtasks());
+        taskRes.setStatus(StatusMapping.mapEntityToRes(task.getStatus()));
         return taskRes;
     }
 
