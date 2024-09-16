@@ -28,8 +28,8 @@ public class SubTaskMapping {
         subTaskRes.setDescription(subTask.getDescription());
         subTaskRes.setCreatedAt(subTask.getCreatedAt());
         subTaskRes.setUpdatedAt(subTask.getUpdatedAt());
-        subTaskRes.setStatus(subTask.getStatus());
-        subTaskRes.setTask(subTask.getTask());
+        subTaskRes.setStatus(StatusMapping.mapEntityToRes(subTask.getStatus()));
+        subTaskRes.setTask(TaskMapping.mapEntityToRes(subTask.getTask()));
         return subTaskRes;
     }
 }

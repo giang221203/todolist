@@ -1,5 +1,5 @@
-::ng-deep .title{
-    font-size: 30px;
-    color: red !important;
+.active {
+    background-color: black;
+    color: white;
+    border-right: 2px solid red;
 }
-

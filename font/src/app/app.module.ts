@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
+import { Component } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { TaskComponent } from './component/task/task.component';
@@ -23,6 +23,14 @@ import { DialogModule } from 'primeng/dialog';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { ToastModule } from 'primeng/toast';
 import { SubtaskComponent } from './component/subtask/subtask.component';
+import { RouterLinkActive } from '@angular/router';
+import { CalendarModule } from 'primeng/calendar';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { DemoComponent } from './component/demo/demo.component';
+import { MenuModule } from 'primeng/menu';
+import { TabMenuModule } from 'primeng/tabmenu';
+import { NotfoundComponent } from './component/notfound/notfound.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -30,6 +38,8 @@ import { SubtaskComponent } from './component/subtask/subtask.component';
     StatusComponent,
     SidebarComponent,
     SubtaskComponent,
+    DemoComponent,
+    NotfoundComponent,
   ],
   imports: [
     BrowserModule,
@@ -50,8 +60,14 @@ import { SubtaskComponent } from './component/subtask/subtask.component';
     DialogModule,
     InputTextareaModule,
     ToastModule,
+    RouterLinkActive,
+    CalendarModule,
+    InputTextModule,
+    ConfirmDialogModule,
+    MenuModule,
+    TabMenuModule,
   ],
-  providers: [DatePipe],
+  providers: [DatePipe, ConfirmationService, MessageService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

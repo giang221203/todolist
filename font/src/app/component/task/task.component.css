@@ -1,0 +1,11 @@
+.sort {
+    color: rgb(61, 101, 142);
+}
+
+.sort:hover {
+    color: rgb(78, 157, 235);
+}
+
+.sortActive {
+    color: rgb(38, 127, 216);
+}

@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { IApiResStatus, IStatus } from '../interface/status.interface';
@@ -13,13 +13,14 @@ export class StatusService {
     page: number,
     limit: number | undefined
   ): Observable<IApiResStatus> {
-    if (limit == null || limit == undefined) {
-      return this.http.get<IApiResStatus>(
-        `http://localhost:8080/api/v1/status/getAll?name=${name}&page=${page}`
-      );
+    let params = new HttpParams();
+    params = params.set('name', name).set('page', page);
+    if (limit) {
+      params = params.set('limit', limit);
     }
     return this.http.get<IApiResStatus>(
-      `http://localhost:8080/api/v1/status/getAll?name=${name}&page=${page}&limit=${limit}`
+      `http://localhost:8080/api/v1/status/getAll`,
+      { params }
     );
   }
   createStatus(status: Omit<IStatus, 'id'>): Observable<IApiResStatus> {

@@ -1,3 +1,18 @@
-<div class="sidebar">
-    <p-megaMenu [style]="{width:'100%',height:'100vh',borderTop:'none'}" [model]="items" orientation="vertical"></p-megaMenu>
+<div class="sidebar ">
+
+    <p-megaMenu
+        [style]="{width:'99%',height:'100vh',borderTop:'none',backgroundColor:'#F5F5F5',boxShadow:'0 2px 3px 0 rgba(0, 0, 0, 0.22)'}"
+        [model]="items" orientation="vertical">
+
+        <ng-template pTemplate="item" let-item>
+            <span class="flex align-items-center cursor-pointer px-3 py-2 ,my-2 "
+                style="border-top-left-radius: 2rem;border-bottom-left-radius: 2rem; " [routerLink]="item.routerink"
+                routerLinkActive="active">
+                <i [ngClass]="item.icon"></i>
+                <span class="ml-2">{{ item.label }}</span>
+            </span>
+        </ng-template>
+    </p-megaMenu>
+
+
 </div>

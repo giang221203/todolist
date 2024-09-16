@@ -50,10 +50,15 @@ public class StatusImpl implements StatusService {
     @Override
     public ApiRes createStatus(StatusReq statusReq) {
         try {
-            Status statusCreate = StatusMapping.mapReqToEntity(statusReq);
+       if(!statusRepository.getAllStatusByNameAndIdNot(statusReq.getName(),0L).isEmpty()){
+           return new ApiRes(false,"Tên status đã tồn tại",null);
+       }else {
+           Status statusCreate = StatusMapping.mapReqToEntity(statusReq);
+           statusRepository.save(statusCreate);
+           return new ApiRes(true, "Thêm status thành công", null);
+       }
 
-            statusRepository.save(statusCreate);
-            return new ApiRes(true, "Thêm status thành công", null);
+
         }catch (Exception e){
             return new ApiRes(false,e.getMessage(),null);
         }
@@ -62,11 +67,14 @@ public class StatusImpl implements StatusService {
     @Override
     public ApiRes updateStatus(Long id, StatusReq statusReq) {
         try {
-            if(id == 1 || id == 2){
-                return new ApiRes(false, "Đây là trạng thái mặc định không được chỉnh sửa", null);
-            }
             Optional<Status> statusbyId = statusRepository.findById(id);
             if(statusbyId.isPresent()){
+                if(!statusRepository.getAllStatusByNameAndIdNot(statusReq.getName(),id).isEmpty()){
+                    return new ApiRes(false,"Tên status đã tồn tại",null);
+                }
+                if(statusbyId.get().getName().equals("open") || statusbyId.get().getName().equals("done")){
+                    return new ApiRes(false, "Đây là trạng thái mặc định không được chỉnh sửa", null);
+                }
                 Status status = StatusMapping.mapReqToEntity(statusReq);
                 status.setId(id);
                 statusRepository.save(status);
@@ -83,11 +91,12 @@ public class StatusImpl implements StatusService {
     @Override
     public ApiRes deleteStatus(Long id) {
         try {
-            if(id == 1 || id == 2){
-                return new ApiRes(false, "Đây là trạng thái mặc định không được xoá", null);
-            }
+
             Optional<Status> statusbyId = statusRepository.findById(id);
             if(statusbyId.isPresent()){
+                if(statusbyId.get().getName().equals("open") || statusbyId.get().getName().equals("done")){
+                    return new ApiRes(false, "Đây là trạng thái mặc định không được xoá", null);
+                }
                 List<Task> taskList = statusbyId.get().getTask();
                 List<SubTask> subTaskList = statusbyId.get().getSubTasks();
                 Optional<Status> status = statusRepository.findById(1L);
